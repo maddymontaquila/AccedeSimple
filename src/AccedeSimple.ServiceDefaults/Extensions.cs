@@ -42,8 +42,6 @@ public static class Extensions
             http.AddServiceDiscovery();
         });
 
-        builder.AddAzureOpenAIClient(connectionName: "openai");
-
         // Uncomment the following to restrict the allowed schemes for service discovery.
         // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
         // {

@@ -30,6 +30,9 @@ builder.Services.AddHttpClient("LocalGuide", c =>
         c.BaseAddress = new Uri("http://localguide");
     });
 
+builder.AddAzureOpenAIClient("gpt").AddChatClient();
+builder.AddAzureOpenAIClient("text-embedding").AddEmbeddingGenerator();
+
 // Load configuration
 builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("UserSettings"));
 
@@ -55,11 +58,6 @@ builder.Services.AddMcpClient();
 
 var kernel = builder.Services.AddKernel();
 
-kernel.Services
-    .AddChatClient(modelName: Environment.GetEnvironmentVariable("MODEL_NAME") ?? "gpt-4o-mini")
-    .UseFunctionInvocation();
-
-kernel.Services.AddEmbeddingGenerator(modelName: "text-embedding-3-small");
 kernel.Services.AddSqliteCollection<int, Document>("Documents", "Data Source=documents.db");
 kernel.Services.AddTransient<ProcessService>();
 kernel.Services.AddTransient<MessageService>();

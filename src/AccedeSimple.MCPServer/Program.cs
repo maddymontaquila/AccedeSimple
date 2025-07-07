@@ -12,7 +12,7 @@ builder.Services.AddMcpServer()
     .WithHttpTransport()
     .WithToolsFromAssembly();
 
-builder.Services.AddChatClient(modelName: Environment.GetEnvironmentVariable("MODEL_NAME") ?? "gpt-4o-mini");
+builder.AddAzureOpenAIClient("gpt").AddChatClient();
 
 var app = builder.Build();
 
