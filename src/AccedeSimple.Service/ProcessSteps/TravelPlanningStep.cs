@@ -81,6 +81,8 @@ public class TravelPlanningStep : KernelProcessStep
                 - Hotel options (location, check-in/out dates, price)
                 - Car rental options if requested
 
+                If dates aren't provided,  assume the trip is 7 days starting tomorrow.
+
                 Ensure that there is a variety of options to choose from, including different airlines, hotels, and car rental companies.
                 
                 Generate at least 3 different trip options with a detailed breakdown of each option.

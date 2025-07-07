@@ -52,7 +52,8 @@ public class ProcessService
                 };             
                 var localGuideRequest = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, builder.Uri));
                 var body = await localGuideRequest.Content.ReadAsStringAsync();
-                await _messageService.AddMessageAsync(new AssistantResponse(body), _userSettings.UserId);
+                var jsonString = JsonSerializer.Deserialize<string>(body);
+                await _messageService.AddMessageAsync(new AssistantResponse(jsonString ?? string.Empty), _userSettings.UserId);
                 break;
             case UserIntent.AskPolicyQuestions:
                 await _process.StartAsync(_kernel, new KernelProcessEvent { Id = nameof(PolicyInquiryStep.ProcessPolicyInquiryAsync), Data = userInput });
