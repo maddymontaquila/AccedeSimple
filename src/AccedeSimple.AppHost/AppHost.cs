@@ -3,40 +3,30 @@ using System.Reflection.Metadata;
 using Microsoft.Extensions.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
-
-// Define parameters for Azure OpenAI
-var azureOpenAIResource = builder.AddParameterFromConfiguration("AzureOpenAIResourceName", "AzureOpenAI:ResourceName");
-var azureOpenAIResourceGroup = builder.AddParameterFromConfiguration("AzureOpenAIResourceGroup", "AzureOpenAI:ResourceGroup");
-var azureOpenAIEndpoint = builder.AddParameterFromConfiguration("AzureOpenAIEndpoint", "AzureOpenAI:Endpoint");
-
-// Get Azure sub config
-var azureSubscriptionId = builder.AddParameterFromConfiguration("AzureSubscriptionId", "Azure:SubscriptionId", secret: true);
-var azureResourceGroup = builder.AddParameterFromConfiguration("AzureResourceGroup", "Azure:ResourceGroup");
-var azureLocation = builder.AddParameterFromConfiguration("AzureLocation", "Azure:Location");
-
+var cae = builder.AddAzureContainerAppEnvironment("cae");
 var modelName = "gpt-4.1";
-
 
 // Configure Azure Services
 var azureStorage = builder.AddAzureStorage("storage");
-var openai =
-        builder.AddAzureOpenAI("openai")
-//        .AsExisting(azureOpenAIResource, azureOpenAIResourceGroup)
-        ;
 
-var embedding = openai.AddDeployment(
+// Run as openai
+var ai = builder.AddAzureAIFoundry("ai");
+
+var embedding = ai.AddDeployment(
     name: "text-embedding",
     modelName: "text-embedding-3-small",
-    modelVersion: "1")
+    modelVersion: "1",
+    format: "OpenAI")
      .WithProperties(d =>
-                {
-                    d.SkuCapacity = 20;
-                });
+        {
+            d.SkuCapacity = 20;
+        });
 
-var gpt = openai.AddDeployment(
+var gpt = ai.AddDeployment(
     name: "gpt",
     modelName: modelName,
-    modelVersion: "2025-04-14")
+    modelVersion: "2025-04-14",
+    format: "OpenAI")
      .WithProperties(d =>
         {
             d.SkuName = "GlobalStandard";
@@ -56,18 +46,16 @@ if (builder.Environment.IsDevelopment())
 var mcpServer =
     builder.AddProject<Projects.AccedeSimple_MCPServer>("mcpserver")
         .WithReference(gpt)
-        .WaitFor(openai);
+        .WaitFor(ai);
 
 
 var pythonApp =
     builder.AddUvApp("localguide", "../localguide", "main.py")
         .WithHttpEndpoint(env: "PORT", port: 8000, isProxied: false)
-        .WithEnvironment("AZURE_OPENAI_ENDPOINT", azureOpenAIEndpoint)
+        .WithEnvironment("AZURE_OPENAI_ENDPOINT", ai.Resource.AIFoundryApiEndpoint)
         .WithEnvironment("MODEL_NAME", modelName)
         .WithOtlpExporter()
-        .WaitFor(openai);
-
-var azureAIFoundryProject = builder.AddParameterFromConfiguration("AzureAIFoundryProject", "AzureAIFoundry:Project");
+        .WaitFor(ai);
 
 var backend =
     builder
@@ -78,10 +66,7 @@ var backend =
         .WithReference(pythonApp)
         .WithReference(azureStorage.AddBlobs("uploads"))
         .WithEnvironment("MODEL_NAME", modelName)
-        .WithEnvironment("AZURE_SUBSCRIPTION_ID", azureSubscriptionId)
-        .WithEnvironment("AZURE_RESOURCE_GROUP", azureOpenAIResourceGroup)
-        .WithEnvironment("AZURE_AI_FOUNDRY_PROJECT", azureAIFoundryProject)
-        .WaitFor(openai);
+        .WaitFor(ai);
 
 builder.AddNpmApp("webui", "../webui")
     .WithNpmPackageInstallation()
