@@ -5,6 +5,11 @@ using Microsoft.Extensions.Hosting;
 var builder = DistributedApplication.CreateBuilder(args);
 var cae = builder.AddAzureContainerAppEnvironment("cae");
 var modelName = "gpt-4.1";
+// var subID = builder.AddParameterFromConfiguration("AzureSubId", "Azure:SubscriptionId", true);
+// if (subID == null)
+// {
+//     new InteractionInput { InputType = InputType.SecretText, Label = "Azure Subscription ID", Placeholder = "Your Azure subscription ID" };
+// }
 
 // Configure Azure Services
 var azureStorage = builder.AddAzureStorage("storage");
@@ -51,7 +56,7 @@ var mcpServer =
 
 var pythonApp =
     builder.AddUvApp("localguide", "../localguide", "main.py")
-        .WithHttpEndpoint(env: "PORT", port: 8000, isProxied: false)
+        .WithHttpEndpoint(env: "PORT")
         .WithEnvironment("AZURE_OPENAI_ENDPOINT", ai.Resource.AIFoundryApiEndpoint)
         .WithEnvironment("MODEL_NAME", modelName)
         .WithOtlpExporter()
@@ -70,12 +75,11 @@ var backend =
 
 builder.AddNpmApp("webui", "../webui")
     .WithNpmPackageInstallation()
-    .WithHttpEndpoint(env: "PORT", port: 35_369, isProxied: false)
+    .WithHttpEndpoint(env: "PORT")
     .WithEnvironment("BACKEND_URL", backend.GetEndpoint("http"))
     .WithExternalHttpEndpoints()
     .WithOtlpExporter()
-    .WaitFor(backend)
-    .PublishAsDockerFile();
+    .WaitFor(backend);
 
 builder.Build().Run();
 #pragma warning restore
