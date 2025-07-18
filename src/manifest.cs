@@ -1,6 +1,36 @@
 #pragma warning disable
+
+#:sdk Microsoft.NET.Sdk
+#:sdk Aspire.AppHost.Sdk@9.4.0-preview.1.25357.1
+
+#region imports
+#:package Aspire.Hosting.AppHost@9.4.0-preview.1.25357.1
+#:package Aspire.Hosting.NodeJS@9.4.0-preview.1.25357.1
+#:package Aspire.Hosting.Python@9.4.0-preview.1.25357.1
+#:package Aspire.Hosting.Azure.AppContainers@9.4.0-preview.1.25357.1
+#:package Aspire.Hosting.Azure.AIFoundry@9.4.0-preview.1.25357.1
+#:package Aspire.Hosting.Azure.Storage@9.4.0-preview.1.25357.1
+#:package Aspire.Hosting.Docker@9.4.0-preview.1.25357.1
+#:package CommunityToolkit.Aspire.Hosting.NodeJS.Extensions@9.5.1-beta.*
+#:package CommunityToolkit.Aspire.Hosting.Python.Extensions@9.5.0
+#:property PublishAot=false
+
 using System.Reflection.Metadata;
 using Microsoft.Extensions.Hosting;
+
+#endregion
+
+#region config
+Environment.SetEnvironmentVariable("ASPIRE_ALLOW_UNSECURED_TRANSPORT", "true");
+Environment.SetEnvironmentVariable("ASPNETCORE_URLS", "http://localhost:5003");
+Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+Environment.SetEnvironmentVariable("ASPIRE_DASHBOARD_OTLP_ENDPOINT_URL", "http://localhost:4317");
+Environment.SetEnvironmentVariable("ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL", "http://localhost:5001");
+
+Environment.SetEnvironmentVariable("Logging__LogLevel__Default", "Information");
+Environment.SetEnvironmentVariable("Logging__LogLevel__Aspire.Hosting.Dcp", "Warning");
+Environment.SetEnvironmentVariable("Logging__LogLevel__Microsoft.AspNetCore", "Warning");
+#endregion
 
 var builder = DistributedApplication.CreateBuilder(args);
 var cae = builder.AddAzureContainerAppEnvironment("cae");
@@ -45,13 +75,13 @@ if (builder.Environment.IsDevelopment())
 
 // Configure projects
 var mcpServer =
-    builder.AddProject<Projects.AccedeSimple_MCPServer>("mcpserver")
+    builder.AddProject("mcpserver", "./AccedeSimple.MCPServer/AccedeSimple.MCPServer.csproj")
         .WithReference(gpt)
         .WaitFor(ai);
 
 
 var pythonApp =
-    builder.AddUvApp("localguide", "../localguide", "main.py")
+    builder.AddUvApp("localguide", "./localguide", "main.py")
         .WithHttpEndpoint(env: "PORT")
         .WithEnvironment("AZURE_OPENAI_ENDPOINT", ai.Resource.AIFoundryApiEndpoint)
         .WithEnvironment("MODEL_NAME", modelName)
@@ -61,7 +91,7 @@ var pythonApp =
 
 var backend =
     builder
-        .AddProject<Projects.AccedeSimple_Service>("backend")
+        .AddProject("backend", "./AccedeSimple.Service/AccedeSimple.Service.csproj")
         .WithReference(gpt)
         .WithReference(embedding)
         .WithReference(mcpServer)
@@ -70,7 +100,7 @@ var backend =
         .WithEnvironment("MODEL_NAME", modelName)
         .WaitFor(ai);
 
-builder.AddNpmApp("webui", "../webui")
+builder.AddNpmApp("webui", "./webui")
     .WithNpmPackageInstallation()
     .WithHttpEndpoint(env: "PORT")
     .WithEnvironment("BACKEND_URL", backend.GetEndpoint("http"))
