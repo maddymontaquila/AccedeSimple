@@ -5,11 +5,6 @@ using Microsoft.Extensions.Hosting;
 var builder = DistributedApplication.CreateBuilder(args);
 var cae = builder.AddAzureContainerAppEnvironment("cae");
 var modelName = "gpt-4.1";
-// var subID = builder.AddParameterFromConfiguration("AzureSubId", "Azure:SubscriptionId", true);
-// if (subID == null)
-// {
-//     new InteractionInput { InputType = InputType.SecretText, Label = "Azure Subscription ID", Placeholder = "Your Azure subscription ID" };
-// }
 
 // Configure Azure Services
 var azureStorage = builder.AddAzureStorage("storage");
