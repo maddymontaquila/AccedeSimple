@@ -3,11 +3,12 @@ using System.Reflection.Metadata;
 using Microsoft.Extensions.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
-var cae = builder.AddAzureContainerAppEnvironment("cae");
+// var cae = builder.AddAzureContainerAppEnvironment("cae");
 var modelName = "gpt-4.1";
 
 // Configure Azure Services
 var azureStorage = builder.AddAzureStorage("storage");
+var blobs = azureStorage.AddBlobs("uploads");
 
 // Run as openai
 var ai = builder.AddAzureAIFoundry("ai");
@@ -55,6 +56,7 @@ var pythonApp =
         .WithEnvironment("AZURE_OPENAI_ENDPOINT", ai.Resource.AIFoundryApiEndpoint)
         .WithEnvironment("MODEL_NAME", modelName)
         .WithOtlpExporter()
+        .PublishAsDockerFile()
         .WaitFor(ai);
 
 var backend =
@@ -64,7 +66,7 @@ var backend =
         .WithReference(embedding)
         .WithReference(mcpServer)
         .WithReference(pythonApp)
-        .WithReference(azureStorage.AddBlobs("uploads"))
+        .WithReference(blobs)
         .WithEnvironment("MODEL_NAME", modelName)
         .WaitFor(ai);
 
@@ -74,7 +76,8 @@ builder.AddNpmApp("webui", "../webui")
     .WithEnvironment("BACKEND_URL", backend.GetEndpoint("http"))
     .WithExternalHttpEndpoints()
     .WithOtlpExporter()
-    .WaitFor(backend);
+    .WaitFor(backend)
+    .PublishAsDockerFile();
 
 builder.Build().Run();
 #pragma warning restore

@@ -24,6 +24,7 @@ graph TD
 ```
 
 ### .NET Projects
+
 - **`AccedeSimple.AppHost/`**: Serves as the entry point and host for the application, managing configuration and startup logic.
 - **`AccedeSimple.Service/`**: Implements the core business logic and service layer, handling travel planning, approvals, and expense processing.
 - **`AccedeSimple.ServiceDefaults/`**: Provides default implementations and shared utilities to support the service layer.
@@ -47,7 +48,7 @@ graph TD
 To run the application, ensure the following tools and frameworks are installed:
 
 - [.NET 9 SDK or greater](https://dotnet.microsoft.com/download)
-- Aspire CLI - `dotnet tool install -g aspire.cli --prerelease`
+- [Aspire CLI](https://learn.microsoft.com/en-us/dotnet/aspire/cli/install?tabs=unix#install-as-a-native-executable)
 - [Python 3.12 or greater](https://www.python.org/downloads/)
 - [UV](https://docs.astral.sh/uv/)
 - [Visual Studio Code](https://code.visualstudio.com/)
@@ -62,12 +63,6 @@ To run the application, ensure the following tools and frameworks are installed:
    cd AccedeSimple
    ```
 
-1. **Configure user secrets**
-
-   1. Navigate to the *_src/AccedeSimple.AppHost* project.
-   1. Set the following user secrets. i.e. `dotnet user-secrets set "Azure:SubscriptionId" "YOUR-VALUE"`
-      - **Azure:SubscriptionId** - The subscription ID you deployed your resources to 
-
 ### Running the app
 
 1. **Run the application**:
@@ -77,13 +72,15 @@ To run the application, ensure the following tools and frameworks are installed:
    aspire run
    ```
 
+Open the Aspire dashboard and enter your Azure Subscription ID to deploy the AI models.
+
 You're now ready to use the Accede Travel Concierge application!
 
 ## Deployment
 
 Follow the standard [deployment guidance for Aspire](https://learn.microsoft.com/dotnet/aspire/deployment/azure/aca-deployment)
 
-1. In the root directory, run the following command
+1. In the Aspire AppHost's directory, run the following command
 
    ```bash
    azd init

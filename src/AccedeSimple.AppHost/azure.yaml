@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
 
-name: accede-simple
+name: accedesimple-apphost
 services:  
   app:
     language: dotnet
-    project: ./src/AccedeSimple.AppHost/AccedeSimple.AppHost.csproj
+    project: ./AccedeSimple.AppHost.csproj
     host: containerapp
