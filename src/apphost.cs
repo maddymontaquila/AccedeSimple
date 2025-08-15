@@ -1,18 +1,18 @@
 #pragma warning disable
 
 #:sdk Microsoft.NET.Sdk
-#:sdk Aspire.AppHost.Sdk@9.4.0-preview.1.25357.1
+#:sdk Aspire.AppHost.Sdk@9.4.0
 
 #region imports
-#:package Aspire.Hosting.AppHost@9.4.0-preview.1.25357.1
-#:package Aspire.Hosting.NodeJS@9.4.0-preview.1.25357.1
-#:package Aspire.Hosting.Python@9.4.0-preview.1.25357.1
-#:package Aspire.Hosting.Azure.AppContainers@9.4.0-preview.1.25357.1
-#:package Aspire.Hosting.Azure.AIFoundry@9.4.0-preview.1.25357.1
-#:package Aspire.Hosting.Azure.Storage@9.4.0-preview.1.25357.1
-#:package Aspire.Hosting.Docker@9.4.0-preview.1.25357.1
-#:package CommunityToolkit.Aspire.Hosting.NodeJS.Extensions@9.5.1-beta.*
-#:package CommunityToolkit.Aspire.Hosting.Python.Extensions@9.5.0
+#:package Aspire.Hosting.AppHost@9.4.0
+#:package Aspire.Hosting.NodeJS@9.4.0
+#:package Aspire.Hosting.Python@9.4.0
+#:package Aspire.Hosting.Azure.AppContainers@9.4.0
+#:package Aspire.Hosting.Azure.AIFoundry@9.4.0-preview.1.25378.8
+#:package Aspire.Hosting.Azure.Storage@9.4.0
+#:package Aspire.Hosting.Docker@9.4.0-preview.1.25378.8
+#:package CommunityToolkit.Aspire.Hosting.NodeJS.Extensions@9.7.0
+#:package CommunityToolkit.Aspire.Hosting.Python.Extensions@9.7.0
 #:property PublishAot=false
 
 using System.Reflection.Metadata;
